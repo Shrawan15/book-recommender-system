@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BookSphere — Find Your Next Read</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    /* ─── CSS Variables ─────────────────────────────────────────── */
+    :root {
+      --bg:          #0d0f14;
+      --surface:     #13161e;
+      --surface2:    #1a1e2a;
+      --border:      #252a38;
+      --accent:      #e8a44a;
+      --accent2:     #c97b28;
+      --gold-dim:    rgba(232,164,74,0.12);
+      --text:        #ecedf2;
+      --text-muted:  #7a8099;
+      --text-dim:    #4e5472;
+      --card-hover:  #1f2437;
+      --radius:      14px;
+      --shadow-lg:   0 8px 40px rgba(0,0,0,0.6);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent2); }
+
+    /* ─── Navbar ── */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,15,20,0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+    }
+    .nav-inner {
+      max-width: 1400px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 70px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--text); letter-spacing: -0.02em;
+    }
+    .brand-name span { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 6px; list-style: none; }
+    .nav-links a {
+      text-decoration: none; color: var(--text-muted);
+      font-size: 0.9rem; font-weight: 500;
+      padding: 8px 16px; border-radius: 8px; transition: all 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); background: var(--surface2); }
+    .nav-links a.active { color: var(--accent); background: var(--gold-dim); }
+
+    /* ─── Page Layout ── */
+    .page-wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 64px 2rem;
+    }
+
+    /* ─── Search Hero ── */
+    .search-hero {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .search-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(232,164,74,0.3);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--accent); text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 24px;
+    }
+    .search-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700; letter-spacing: -0.03em;
+      line-height: 1.15; margin-bottom: 16px;
+    }
+    .search-hero h1 span {
+      background: linear-gradient(135deg, var(--accent), #f5c97a);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .search-hero p {
+      color: var(--text-muted); font-size: 1rem; font-weight: 300;
+      max-width: 480px; margin: 0 auto 40px;
+    }
+
+    /* ─── Search Box ── */
+    .search-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: var(--shadow-lg);
+    }
+    .search-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.07em; margin-bottom: 12px;
+    }
+    .search-label i { color: var(--accent); }
+
+    .input-row {
+      display: flex; gap: 12px;
+      align-items: stretch;
+    }
+    .search-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem; font-weight: 400;
+      padding: 14px 20px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-input::placeholder { color: var(--text-dim); }
+    .search-input:focus {
+      border-color: rgba(232,164,74,0.5);
+      background: var(--card-hover);
+      box-shadow: 0 0 0 3px rgba(232,164,74,0.08);
+    }
+
+    .search-btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none; border-radius: 12px;
+      color: #0d0f14; font-family: 'Inter', sans-serif;
+      font-size: 0.9rem; font-weight: 700;
+      padding: 14px 28px; cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .search-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .search-btn:active { transform: translateY(0); }
+
+    /* Hints */
+    .search-hints {
+      display: flex; align-items: center; gap: 8px;
+      flex-wrap: wrap; margin-top: 14px;
+    }
+    .hint-label { font-size: 0.74rem; color: var(--text-dim); }
+    .hint-chip {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 100px; padding: 4px 12px;
+      font-size: 0.74rem; color: var(--text-muted);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .hint-chip:hover { border-color: rgba(232,164,74,0.4); color: var(--accent); }
+
+    /* ─── How It Works ── */
+    .how-section {
+      margin: 56px 0;
+    }
+    .how-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 700;
+      margin-bottom: 24px; text-align: center;
+    }
+    .how-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    .how-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 20px; text-align: center;
+      transition: all 0.2s;
+    }
+    .how-card:hover {
+      border-color: rgba(232,164,74,0.3);
+      transform: translateY(-2px);
+    }
+    .how-icon {
+      width: 48px; height: 48px;
+      background: var(--gold-dim); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin: 0 auto 14px;
+    }
+    .how-card h3 {
+      font-size: 0.9rem; font-weight: 600; margin-bottom: 6px;
+    }
+    .how-card p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* ─── Results Section ── */
+    .results-section { margin-top: 56px; }
+
+    .results-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .results-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem; font-weight: 700;
+    }
+    .results-title span { color: var(--accent); }
+    .result-count {
+      background: var(--gold-dim);
+      border: 1px solid rgba(232,164,74,0.3);
+      border-radius: 100px;
+      padding: 4px 14px;
+      font-size: 0.78rem; font-weight: 600; color: var(--accent);
+    }
+
+    /* Recommendation cards - horizontal layout */
+    .rec-list { display: flex; flex-direction: column; gap: 20px; }
+
+    .rec-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex; gap: 24px; overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      cursor: pointer;
+    }
+    .rec-card:hover {
+      border-color: rgba(232,164,74,0.4);
+      background: var(--card-hover);
+      transform: translateX(4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .rec-cover-wrap {
+      flex-shrink: 0;
+      width: 110px;
+      background: var(--surface2);
+      overflow: hidden;
+    }
+    .rec-cover-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .rec-card:hover .rec-cover-wrap img { transform: scale(1.05); }
+
+    .rec-body {
+      padding: 22px 22px 22px 0;
+      flex: 1;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .rec-index {
+      font-size: 0.7rem; font-weight: 700;
+      color: var(--accent); text-transform: uppercase;
+      letter-spacing: 0.1em; margin-bottom: 8px;
+    }
+    .rec-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; font-weight: 700;
+      line-height: 1.3; margin-bottom: 6px; color: var(--text);
+    }
+    .rec-author {
+      font-size: 0.84rem; color: var(--text-muted); margin-bottom: 14px;
+    }
+    .rec-author i { color: var(--accent); margin-right: 5px; font-size: 0.75rem; }
+
+    .rec-tag-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .rec-tag {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 100px; padding: 4px 12px;
+      font-size: 0.72rem; color: var(--text-muted);
+    }
+    .rec-tag.similar {
+      background: var(--gold-dim); border-color: rgba(232,164,74,0.3);
+      color: var(--accent);
+    }
+
+    /* ─── Empty State ── */
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      background: var(--surface);
+      border: 1px dashed var(--border); border-radius: var(--radius);
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.4; }
+    .empty-state h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; margin-bottom: 8px;
+    }
+    .empty-state p { color: var(--text-muted); font-size: 0.88rem; }
+
+    /* ─── Footer ── */
+    .footer {
+      border-top: 1px solid var(--border); padding: 40px 2rem;
+      text-align: center; margin-top: 80px;
+    }
+    .footer-inner { max-width: 960px; margin: 0 auto; }
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; font-weight: 700; margin-bottom: 8px;
+    }
+    .footer-brand span { color: var(--accent); }
+    .footer p { color: var(--text-dim); font-size: 0.82rem; }
+
+    /* ─── Loading spinner ── */
+    .spinner {
+      display: none; text-align: center; padding: 40px;
+    }
+    .spinner-ring {
+      display: inline-block; width: 48px; height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .rec-card {
+      animation: fadeUp 0.4s ease both;
+    }
+
+    /* ─── Responsive ── */
+    @media (max-width: 640px) {
+      .input-row { flex-direction: column; }
+      .how-grid { grid-template-columns: 1fr; }
+      .rec-cover-wrap { width: 80px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navbar ── -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="/" class="brand">
+        <div class="brand-icon">📚</div>
+        <span class="brand-name">Book<span>Sphere</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/">🏠 Home</a></li>
+        <li><a href="/recommend" class="active">✨ Recommend</a></li>
+      </ul>
+      <a href="/" style="text-decoration:none; padding:8px 20px; border-radius:8px; font-size:0.88rem; font-weight:600; background:var(--surface2); border:1px solid var(--border); color:var(--text-muted);">
+        ← Back to Home
+      </a>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+
+    <!-- ── Search Hero ── -->
+    <div class="search-hero">
+      <div class="search-eyebrow">
+        <i class="fas fa-wand-magic-sparkles" style="font-size:0.7rem;"></i>
+        AI-Powered Matching
+      </div>
+      <h1>Find Books <span>Just for You</span></h1>
+      <p>Type a book you love and we'll find similar ones using collaborative filtering.</p>
+    </div>
+
+    <!-- ── Search Box ── -->
+    <div class="search-container">
+      <div class="search-label">
+        <i class="fas fa-search"></i> Enter a Book Title
+      </div>
+      <form action="/recommend_books" method="post" id="searchForm" onsubmit="handleSubmit()">
+        <div class="input-row">
+          <input
+            type="text"
+            name="user_input"
+            id="bookInput"
+            class="search-input"
+            placeholder="e.g. Harry Potter and the Chamber of Secrets"
+            value="{{ request.form.get('user_input', '') if request else '' }}"
+            autocomplete="off"
+            required
+          />
+          <button type="submit" class="search-btn">
+            <i class="fas fa-sparkles"></i>
+            Find Similar
+          </button>
+        </div>
+      </form>
+      <div class="search-hints">
+        <span class="hint-label">Try:</span>
+        <span class="hint-chip" onclick="fillInput('The Da Vinci Code')">The Da Vinci Code</span>
+        <span class="hint-chip" onclick="fillInput('Harry Potter and the Chamber of Secrets')">Harry Potter</span>
+        <span class="hint-chip" onclick="fillInput('The Notebook')">The Notebook</span>
+        <span class="hint-chip" onclick="fillInput('A Walk to Remember')">A Walk to Remember</span>
+      </div>
+    </div>
+
+    <!-- Spinner -->
+    <div class="spinner" id="spinner">
+      <div class="spinner-ring"></div>
+      <p style="color:var(--text-muted);font-size:0.84rem;margin-top:14px;">Finding your next great read…</p>
+    </div>
+
+    <!-- ── How It Works ── -->
+    {% if not data %}
+    <div class="how-section">
+      <h2 class="how-title">How It Works</h2>
+      <div class="how-grid">
+        <div class="how-card">
+          <div class="how-icon">📖</div>
+          <h3>Enter a Book</h3>
+          <p>Type any book title you've enjoyed from our dataset of 270K+ books.</p>
+        </div>
+        <div class="how-card">
+          <div class="how-icon">🔬</div>
+          <h3>ML Analysis</h3>
+          <p>Our collaborative filtering model analyses rating patterns of similar readers.</p>
+        </div>
+        <div class="how-card">
+          <div class="how-icon">✨</div>
+          <h3>Get Matches</h3>
+          <p>Receive the 4 most similar books based on cosine similarity scores.</p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ── Results ── -->
+    {% if data %}
+    <div class="results-section">
+      <div class="results-header">
+        <h2 class="results-title">
+          Books Similar to <span>"{{ request.form.get('user_input') }}"</span>
+        </h2>
+        <span class="result-count">{{ data|length }} found</span>
+      </div>
+
+      <div class="rec-list">
+        {% for item in data %}
+        <div class="rec-card" style="animation-delay: {{ loop.index0 * 0.08 }}s;">
+          <div class="rec-cover-wrap">
+            <img
+              src="{{ item[2] }}"
+              alt="{{ item[0] }}"
+              loading="lazy"
+              onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--surface2);\'><i class=\'fas fa-book\' style=\'color:var(--text-dim);font-size:2rem;\'></i></div>'"
+            />
+          </div>
+          <div class="rec-body">
+            <div class="rec-index">Recommendation #{{ loop.index }}</div>
+            <div class="rec-title">{{ item[0] }}</div>
+            <div class="rec-author">
+              <i class="fas fa-pen-nib"></i>{{ item[1] }}
+            </div>
+            <div class="rec-tag-row">
+              <span class="rec-tag similar">✦ Similar to your pick</span>
+              <span class="rec-tag">📚 Collaborative Filter</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Search again prompt -->
+      <div style="text-align:center; margin-top:40px;">
+        <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:14px;">Not what you expected? Try a different book.</p>
+        <a href="/recommend" style="display:inline-flex; align-items:center; gap:8px; background:var(--gold-dim); border:1px solid rgba(232,164,74,0.3); border-radius:10px; padding:10px 24px; color:var(--accent); text-decoration:none; font-size:0.88rem; font-weight:600; transition:all 0.2s;">
+          <i class="fas fa-redo"></i> Search Again
+        </a>
+      </div>
+    </div>
+
+    {% elif request and request.method == 'POST' %}
+    <!-- No results found state -->
+    <div class="results-section">
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>No Results Found</h3>
+        <p>We couldn't find that book in our dataset. Please check the title or try another book.</p>
+      </div>
+    </div>
+    {% endif %}
+
+  </div><!-- /page-wrap -->
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">Book<span>Sphere</span></div>
+
+    </div>
+  </footer>
+
+  <script>
+    function fillInput(text) {
+      document.getElementById('bookInput').value = text;
+      document.getElementById('bookInput').focus();
+    }
+    function handleSubmit() {
+      document.getElementById('spinner').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
