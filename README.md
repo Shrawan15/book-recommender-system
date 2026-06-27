@@ -10,7 +10,7 @@
 
 ## 🌟 Live Demo
 
-> `https://book-recommender-system-mucgfdkambzqw9r5i3mf3x.streamlit.app`
+> Deployed on Streamlit Cloud — [Click here to try it out](https://book-recommender-system-mucgfdkambzqw9r5i3mf3x.streamlit.app)
 
 ---
 
